@@ -1,0 +1,4 @@
+(Pair (Pair (Pair (Pair { "tz1STSXqr1JDhYPsYQvP8nLE27bUts1qe9dL" } False)
+                  { Elt "tz1STSXqr1JDhYPsYQvP8nLE27bUts1qe9dL" 0 })
+            { Elt "tz1STSXqr1JDhYPsYQvP8nLE27bUts1qe9dL" 1 })
+      { Elt "tz1STSXqr1JDhYPsYQvP8nLE27bUts1qe9dL" 1 })

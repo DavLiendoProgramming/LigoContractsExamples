@@ -1,0 +1,24 @@
+{
+  "mnemonic": [
+    "nut",
+    "weasel",
+    "bundle",
+    "round",
+    "exclude",
+    "arm",
+    "long",
+    "tissue",
+    "laundry",
+    "device",
+    "true",
+    "aspect",
+    "hill",
+    "believe",
+    "desert"
+  ],
+  "secret": "4ec99a4c5aeb3c87ce5c2dfd9dec438ce8847227",
+  "amount": "20697272538",
+  "pkh": "tz1STSXqr1JDhYPsYQvP8nLE27bUts1qe9dL",
+  "password": "z4t5JmZ4aU",
+  "email": "btqnvxmz.vpohjlbc@tezos.example.org"
+}
