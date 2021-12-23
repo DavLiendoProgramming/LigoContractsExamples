@@ -12,6 +12,7 @@
 
 #include "nft_token.mligo"
 
+(* parameter that will be user for minting a new token*)
 type mint_param =
 [@layout:comb]
 {
@@ -25,7 +26,7 @@ type mint_param =
 type token_manager =
   | Mint_tokens of mint_param
   | Burn_tokens of token_def
-
+(*Create an entry point for changing the closed nft status for switching capability of transfer*)
 
 let validate_mint_param (p : mint_param) : unit =
   let num_tokens = is_nat (p.token_def.to_ - p.token_def.from_) in
@@ -33,34 +34,72 @@ let validate_mint_param (p : mint_param) : unit =
   | None -> failwith "EMPTY_TOKEN_DEF_RANGE"
   | Some n -> if n <> List.size p.owners then failwith "INVALID_OWNERS_LENGTH" else unit
 
+(*Ask john*)
 type zip_acc = {
   zip : (address * token_id ) list;
   next_token : token_id;
 }
+
+(*fold right?*)
 let zip_owners_with_token_ids (owners, from_token_id : (address list) * token_id) :
     (address * token_id ) list =
   let res = List.fold 
+  (* anon function *)
     ( fun (acc, owner : zip_acc * address) ->
       {
         zip = (owner, acc.next_token) :: acc.zip;
         next_token = acc.next_token + 1n;
       }
     ) 
+    (* list *)
     owners 
+    (* accumulator? *)
     { 
+      (*List of tuples of owner address and token id*)
       zip = ([] : (address * token_id) list); 
       next_token = from_token_id; 
     }
   in
   res.zip
 
+(**
+  type token_def =
+  [@layout:comb]
+  {
+    from_ : nat;
+    to_ : nat;
+  }
+  type token_metadata =
+  [@layout:comb]
+  {
+    token_id : token_id;
+    token_info : (string, bytes) map;
+  }
+  type nft_meta = (token_def, token_metadata) big_map
+
+  type token_storage = { 
+    token_defs : token_def set;
+    next_token_id : token_id;
+    metadata : nft_meta;
+  }
+
+  type nft_token_storage = {
+    ledger : ledger;
+    operators : operator_storage;
+    metadata : token_storage;
+  }
+
+*)
+
 let mint_tokens (p, s : mint_param * nft_token_storage) : nft_token_storage =
   let u = validate_mint_param p in
   if s.metadata.next_token_id > p.token_def.from_
   then (failwith "USED_TOKEN_IDS" : nft_token_storage)
   else
+  (*metadata for token_storage*)
     let new_metadata = {
       token_defs = Set.add p.token_def s.metadata.token_defs;
+      (* adds the metadata of type nft_meta*)
       metadata = Big_map.add p.token_def p.metadata s.metadata.metadata;
       next_token_id = p.token_def.to_;
     } in

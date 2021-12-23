@@ -19,7 +19,17 @@ type token_def =
 
 type nft_meta = (token_def, token_metadata) big_map
 
-type token_storage = {
+(*
+type token_metadata =
+[@layout:comb]
+{
+  token_id : token_id;
+  token_info : (string, bytes) map;
+  is_token_closed: bool;
+}
+*)
+
+type token_storage = { 
   token_defs : token_def set;
   next_token_id : token_id;
   metadata : nft_meta;
@@ -50,7 +60,7 @@ let get_balance (p, ledger : balance_of_param * ledger) : operation =
   Tezos.transaction responses 0mutez p.callback
 
 (**
-Update leger balances according to the specified transfers. Fails if any of the
+Update legder balances according to the specified transfers. Fails if any of the
 permissions or constraints are violated.
 @param txs transfers to be applied to the ledger
 @param validate_op function that validates of the tokens from the particular owner can be transferred. 
@@ -60,6 +70,7 @@ let transfer (txs, validate_op, ops_storage, ledger
   (* process individual transfer *)
   let make_transfer = (fun (l, tx : ledger * transfer) ->
     List.fold 
+    (*anon function for finding *)
       (fun (ll, dst : ledger * transfer_destination) ->
         if dst.amount = 0n
         then ll
@@ -110,6 +121,8 @@ let fa2_main (param, storage : fa2_entry_points * nft_token_storage)
     : (operation  list) * nft_token_storage =
   match param with
   | Transfer txs ->
+    (*make it unavailable if nft_is_closed*)
+    (*if(   )*)
     let new_ledger = transfer 
       (txs, default_operator_validator, storage.operators, storage.ledger) in
     let new_storage = { storage with ledger = new_ledger; } in
@@ -124,18 +137,18 @@ let fa2_main (param, storage : fa2_entry_points * nft_token_storage)
     let new_storage = { storage with operators = new_ops; } in
     ([] : operation list), new_storage
 
-  type nft_entry_points =
-  | Fa2 of fa2_entry_points
-  | Token_metadata of token_metadata_param
+type nft_entry_points =
+| Fa2 of fa2_entry_points
+| Token_metadata of token_metadata_param
 
-  let nft_token_main (param, storage : nft_entry_points * nft_token_storage)
-      : (operation  list) * nft_token_storage =
-    match param with
-    | Fa2 fa2 -> fa2_main (fa2, storage)
-    | Token_metadata p ->
-      let metas = get_metadata (p.token_ids, storage.metadata) in
-      let u = p.handler metas in
-      ([] : operation list), storage
+let nft_token_main (param, storage : nft_entry_points * nft_token_storage)
+    : (operation  list) * nft_token_storage =
+  match param with
+  | Fa2 fa2 -> fa2_main (fa2, storage)
+  | Token_metadata p ->
+    let metas = get_metadata (p.token_ids, storage.metadata) in
+    let u = p.handler metas in
+    ([] : operation list), storage
 
 
 

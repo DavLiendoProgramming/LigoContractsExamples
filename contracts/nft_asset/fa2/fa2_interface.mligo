@@ -57,6 +57,7 @@ type token_metadata =
 {
   token_id : token_id;
   token_info : (string, bytes) map;
+  is_token_closed: bool;
 }
 
 (*
