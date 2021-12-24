@@ -30,6 +30,7 @@ type mint_burn_tokens_param = mint_burn_tx list
 type token_manager =
   | Create_token of token_metadata
   | Mint_tokens of mint_burn_tokens_param
+  | Close_Nft of token_id
 //  | Burn_tokens of mint_burn_tokens_param
 
 
@@ -111,11 +112,11 @@ let burn_tokens (param, storage : mint_burn_tokens_param * multi_token_storage)
 
 (*updates a big map of closed nfts*)
 let update_closed_nft (param, storage: token_id * multi_token_storage)
-    : multi_token_storae = 
-    if not Big_map.mem token_id storage.closed_nfts
-    then (failwith "Token not found")
+    : multi_token_storage = 
+    if not Big_map.mem param storage.closed_nfts
+    then (failwith "Token not found" : multi_token_storage)
     else
-    let new_closed_nfts = Big_map.update (param : token_id) (true : bool) multi_token_storage.closed_nfts in 
+    let new_closed_nfts = Big_map.update (param : token_id) (Some(true : bool)) storage.closed_nfts in 
     let new_s = { storage with
       closed_nfts = new_closed_nfts;
     } in 

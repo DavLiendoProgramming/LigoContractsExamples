@@ -60,11 +60,12 @@ let transfer (txs, validate_op, storage
   let make_transfer = fun (l, tx : ledger * transfer) ->
     List.fold
       (fun (ll, dst : ledger * transfer_destination) ->
-        if not Big_map.mem dst.token_id storage.token_metadata
-        then (failwith fa2_token_undefined : ledger)
         (*checks if the nft is closed, fails if false*)
         if not Big_map.mem dst.token_id storage.closed_nfts
-        then (failwith "Not able to transfer token")
+        then (failwith "Not able to transfer token" : ledger)
+        else  
+        if not Big_map.mem dst.token_id storage.token_metadata
+        then (failwith fa2_token_undefined : ledger)
         else
           let _u = validate_op (tx.from_, Tezos.sender, dst.token_id, storage.operators) in
           let lll = dec_balance (tx.from_, dst.token_id, dst.amount, ll) in

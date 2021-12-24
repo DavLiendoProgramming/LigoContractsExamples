@@ -9,6 +9,7 @@
     operators = (Big_map.empty : operator_storage);
     token_total_supply = (Big_map.empty : token_total_supply);
     token_metadata = (Big_map.empty : token_metadata_storage);
+    closed_nfts = (Big_map.empty : closed_nfts);
   };
   metadata = Big_map.literal [
     ("", Bytes.pack "tezos-storage:content" );
