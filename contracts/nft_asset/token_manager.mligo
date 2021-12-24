@@ -40,7 +40,7 @@ type zip_acc = {
   next_token : token_id;
 }
 
-(*fold right?*)
+(*fold_right?*)
 let zip_owners_with_token_ids (owners, from_token_id : (address list) * token_id) :
     (address * token_id ) list =
   let res = List.fold 
