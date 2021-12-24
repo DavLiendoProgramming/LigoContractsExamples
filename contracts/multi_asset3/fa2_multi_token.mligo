@@ -11,11 +11,15 @@ type ledger = ((address * token_id), nat) big_map
 (* token_id -> total_supply *)
 type token_total_supply = (token_id, nat) big_map
 
+(* token_id -> bool*)
+type closed_nfts = (token_id, bool) big_map
+
 type multi_token_storage = {
   ledger : ledger;
   operators : operator_storage;
   token_total_supply : token_total_supply;
   token_metadata : token_metadata_storage;
+  closed_nfts : closed_nfts;
 }
 
 let get_balance_amt (key, ledger : (address * nat) * ledger) : nat =
@@ -45,7 +49,7 @@ let dec_balance (owner, token_id, amt, ledger
     else Big_map.update key (Some new_bal) ledger
 
 (**
-Update leger balances according to the specified transfers. Fails if any of the
+Update ledger balances according to the specified transfers. Fails if any of the
 permissions or constraints are violated.
 @param txs transfers to be applied to the ledger
 @param validate_op function that validates of the tokens from the particular owner can be transferred.
@@ -58,6 +62,9 @@ let transfer (txs, validate_op, storage
       (fun (ll, dst : ledger * transfer_destination) ->
         if not Big_map.mem dst.token_id storage.token_metadata
         then (failwith fa2_token_undefined : ledger)
+        (*checks if the nft is closed, fails if false*)
+        if not Big_map.mem dst.token_id storage.closed_nfts
+        then (failwith "Not able to transfer token")
         else
           let _u = validate_op (tx.from_, Tezos.sender, dst.token_id, storage.operators) in
           let lll = dec_balance (tx.from_, dst.token_id, dst.amount, ll) in
