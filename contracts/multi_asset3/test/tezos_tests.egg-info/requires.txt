@@ -1,0 +1,5 @@
+crypto
+fastecdsa
+pysodium
+pytezos
+secp256k1

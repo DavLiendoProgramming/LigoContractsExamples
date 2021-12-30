@@ -134,7 +134,7 @@ let token_manager (param, s : token_manager * multi_token_storage)
     let new_s = mint_tokens (param, s) in
     ([] : operation list), new_s
 
-  | Close_Nft param ->
+  | Close_nft param ->
     let new_s = update_closed_nft(param, s) in
     ([] : operation list), new_s
 //  | Burn_tokens param ->
