@@ -1,0 +1,3 @@
+dligo: too many arguments, don't know what to do with `multi_asset_main'
+Usage: ligo compile-contract [OPTION]... SOURCE_FILE ENTRY_POINT
+Try `ligo compile-contract --help' or `ligo --help' for more information.

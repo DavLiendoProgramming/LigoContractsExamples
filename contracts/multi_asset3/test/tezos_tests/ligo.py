@@ -9,7 +9,7 @@ from pytezos.operation.result import OperationResult
 from pytezos.rpc.errors import RpcError
 from pytezos.operation import fees
 
-ligo_version = "0.7.1"
+ligo_version = "0.30.0"
 ligo_cmd = (
     f'docker run --rm -v "$PWD":"$PWD" -w "$PWD" ligolang/ligo:{ligo_version} "$@"'
 )
@@ -27,6 +27,8 @@ class LigoEnv:
                 tz_file_name = tz_file_name.with_suffix(".tz")
         else:
             tz_file_name = Path(file_name).with_suffix(".tz")
+
+            ##Remember to add main entry point name
         return LigoContract(
             self.src_dir / file_name, self.out_dir / tz_file_name, main_func
         )
@@ -53,11 +55,11 @@ class LigoContract:
         pytezos.
         :return: pytezos.ContractInterface
         """
-        command = f"{ligo_cmd} compile-contract {self.ligo_file} {self.main_func}"
-        michelson = self._ligo_to_michelson(command)
+        command = f"{ligo_cmd} compile contract {self.ligo_file} {self.main_func}"
+        michelson = self._ligo_to_michelson()
         self.tz_file.write_text(michelson)
         self.contract_interface = ContractInterface.create_from(michelson)
-        return self.contract_interface
+        return self.contract_interfacecommand
 
     def get_contract(self):
         """
@@ -75,7 +77,9 @@ class LigoContract:
         Compiles LIGO encoded storage to Python object to be used with pytezos.
         :return:  object
         """
-        command = f"{ligo_cmd} compile-storage {self.ligo_file} {self.main_func} '{ligo_storage}'"
+        print('Compiling storage')
+        command = f"{ligo_cmd} compile storage '{self.ligo_file}' '{ligo_storage}' -e {self.main_func} -s cameligo -o '{self.tz_file}'"
+        print("Used command:", command)
         michelson = self._ligo_to_michelson_sanitized(command)
         c = self.get_contract()
         return c.contract.storage.decode(michelson)
@@ -86,7 +90,7 @@ class LigoContract:
         :param ligo_parameter: LIGO string encoding entry point and parameter
         :return: object:
         """
-        command = f"{ligo_cmd} compile-parameter {self.ligo_file} {self.main_func} '{ligo_parameter}'"
+        command = f"{ligo_cmd} compile parameter {self.ligo_file} {self.main_func} '{ligo_parameter}'"
         michelson = self._ligo_to_michelson_sanitized(command)
         c = self.get_contract()
         return c.contract.parameter.decode(michelson)
@@ -108,7 +112,7 @@ class LigoContract:
     def _sanitize(self, michelson):
         stripped = michelson.strip()
         if stripped.startswith("(") and stripped.endswith(")"):
-            return stripped[1:-1]
+            return stribzpped[1:-1]
         else:
             return stripped
 
@@ -218,7 +222,7 @@ class PtzUtils:
 
 flextesa_sandbox = pytezos.using(
     shell="http://localhost:20000",
-    key=Key.from_encoded_key("edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx"),
+    key=Key.from_encoded_key("edskRgKugq57pKCZcF5f75yDS4h2iEYWRREAo2ZkNYPqkmTKSRWJkBiZxQ7aE9PXcGhJaz5w59F9mGUWiS24WnnW3ya68tAgek"),
 )
 
 
